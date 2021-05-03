@@ -5,31 +5,27 @@ package com.interviewBit.array
  */
 class Solution {
   def coverPoints(A: Array[Int], B: Array[Int]): Int = {
-    val coordinates: Seq[(Int, Int)] = A.zip(B)
-    var index = 0
-    var totalMove = 0
-    while (index < coordinates.length - 1) {
-      val first = coordinates(index)
-      val second = coordinates(index + 1)
-      index += 1
-      totalMove += move(first, second, 0)
+    val coordinates: Vector[(Int, Int)] = A.zip(B).toVector
 
+    def getTotalMoves(a: (Int, Int), coordinates: Vector[(Int, Int)], acc: Int): Int = {
+      (a, coordinates) match {
+        case (_, IndexedSeq()) => acc
+        case ((a: Int, b: Int), head +: tail) => {
+          val moves = move((a, b), (head._1, head._2))
+          getTotalMoves(head, tail, acc + moves)
+        }
+      }
     }
-    totalMove
+
+    getTotalMoves(coordinates.head, coordinates.tail, 0)
   }
 
-  def move(a: (Int, Int), b: (Int, Int), acc: Int): Int = {
-    if (a._1 != b._1 || a._2 != b._2) {
-      val newAx: Int = if (a._1 < b._1) a._1 + 1
-      else if (a._1 > b._1) a._1 - 1
-      else a._1
-
-      val newAy = if (a._2 < b._2) a._2 + 1
-      else if (a._2 > b._2) a._2 - 1
-      else a._2
-      move((newAx, newAy), (b._1, b._2), acc + 1)
-    } else {
-      acc
-    }
+  def move(a: (Int, Int), b: (Int, Int)): Int = {
+    Math.max(Math.abs(b._1 - a._1), Math.abs(b._2 - a._2))
   }
+}
+
+object TestFunct extends App {
+  val sol = new Solution()
+  println(sol.coverPoints(Array(1, 2, 3), Array(1, 2, 3)))
 }
